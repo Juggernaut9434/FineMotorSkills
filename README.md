@@ -19,3 +19,6 @@ Through out this project, the team has designed:
 1. Read/listen to instructions
 1. Through the exercises you will build fine motor skills
 that can be used in the real world.
+
+## Design Spefications
+- Canvas is 600x400
