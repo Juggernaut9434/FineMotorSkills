@@ -9,8 +9,7 @@ var startX, startY, finishX, finishY;
 function setup() {
   createCanvas(600, 400);
   background("pink");
-  fill(255,255,255,0);
-  rect(150, 175, 300, 50);
+  
   drawRects("red");
 }
 
@@ -18,9 +17,14 @@ function draw() {
 }
 
 function drawRects(color="red") {
+  // middle box
+  fill(255,255,255,0);
+  rect(150, 175, 300, 50);
+  //two red boxes
   fill(color);
   rect(50, 400/2 - 25, 100, 50);
   rect(450, 400/2 - 25, 100, 50);
+  //add text to the red boxes
   fill("black");
   textSize(30);
   text("Start", 50+15, height/2+10);
@@ -36,7 +40,9 @@ function mouseDragged() {
   finishX = mouseX;
   finishY = mouseY;
   strokeWeight(10);
+  stroke(0);
   line(startX, startY, finishX, finishY);
+  noStroke();
 }
 function mouseReleased() {
   if(startY < 180 || startY > 230
