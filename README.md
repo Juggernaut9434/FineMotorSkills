@@ -12,10 +12,9 @@ Through out this project, the team has designed:
 **Timeline** can be found 
 [here](https://docs.google.com/spreadsheets/d/1YAJukAcdFkS-LlUdhAxOKyE4ZGUI0cYuDN8t8OYUvTc/edit?usp=sharing)
 
-## How to Use
 
-1. Go to this [link](about:blank)
-1. Click on one of the 3 activities that have pictures on them
-1. Read/listen to instructions
-1. Through the exercises you will build fine motor skills
-that can be used in the real world.
+
+## How to Use
+go to link
+
+https://editor.p5js.org/mmmathe4/present/Z4o3DdYJ-
