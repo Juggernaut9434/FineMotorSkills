@@ -4,6 +4,8 @@
 // from one side of the screen to the other using
 // a mouse or finger
 
+// MIKE TODO: fix the draw line color
+
 /***************************************************
 ****************GLOBACL_VARIABLES*******************
 ****************************************************/
@@ -99,16 +101,11 @@ function setupStartFinish() {
     case 0:
       {
         background("pink");
-
-        o1 = new Obstacle(50, 175);
-        o2 = new Obstacle(450, 175);
+        // randomly set the locations of the two boxes
+        let minX = 20, maxX = 450, minY = 20, maxY = 350;
+        o1 = new Obstacle(random(minX,maxX/2-50), random(minY, maxY));
+        o2 = new Obstacle(random(maxX/2+50,maxX), random(minY, maxY));
       }
-      break;
-    // LEVEL 2
-    case 1:
-      background("blue");
-      o1 = new Obstacle(30, 325);
-      o2 = new Obstacle(70, 50);
       break;
     // ERROR HAPPENED
     default:
@@ -157,23 +154,11 @@ function draw() {
 
 function drawStartToFinish()
 {
-  // Set different levels to a game
-  switch(step) {
-    // DEFAULT LEVEL / starting level
-    case 0:
-      // draw a dashed line
-      fill(0);
-      textSize(30);
-      linedash( o1.x+o1.width/2, o1.y+o1.height/2, 
-                o2.x+o2.width/2, o2.y+o2.height/2, 10);
-      break;
-    // LEVEL 2
-    case 1:
-      break;
-    // ERROR MESSAGE
-    default:
-      errorMsg("drawStartToFinish");
-  }
+  // draw a dashed line
+  fill(0);
+  textSize(30);
+  linedash( o1.x+o1.width/2, o1.y+o1.height/2, 
+            o2.x+o2.width/2, o2.y+o2.height/2, 10);
 }
 
 /***************************************************
@@ -239,15 +224,22 @@ function mouseDragged() {
     case 3:
       {
         // redraw the beginning
-				// to prevent multiple lines drawn at once
-				setup();
-				// log the end point
-				finish = new Point(mouseX, mouseY);
-				// draw the line
-				strokeWeight(10);
-				stroke(0);
-				line(start.x, start.y, finish.x, finish.y);
+		// to prevent multiple lines drawn at once
+		background("pink");
+		o1.show(); o2.show();
+		// log the end point
+        finish = new Point(mouseX, mouseY);
+        //draw the line
+        stroke(0);
+        line(start.x, start.y, finish.x, finish.y);
+				// draw the dashed line
+        fill(0);
+        strokeWeight(1);
+        linedash( o1.x+o1.width/2, o1.y+o1.height/2, 
+        o2.x+o2.width/2, o2.y+o2.height/2, 10);
 				noStroke();
+        strokeWeight(10);
+        fill(0);
       }
       break;
     // ERROR MESSAGE
@@ -294,19 +286,34 @@ function mouseReleased() {
 function STFmouseReleased() {
 	switch (step) {
     case 0:
-      if (inside(o1, start) && inside(o2, finish)) {
+      // if line is inside boxes
+			if ((inside(o1, start) && inside(o2, finish))
+				|| (inside(o1, finish) && inside(o2, start)) ) {
+        // draw the smile face
         fill(0);
         textSize(30);
         text(":)", 250, 80);
         noStroke();
+        // change boxes color to green
         o1.clr = "green";
         o2.clr = "green";
-        // replay the level, be commented next line
-        //step++;
         return;
       } else {
 
-        setup();
+        // redraw the beginning
+				// to prevent multiple lines drawn at once
+				background("pink");
+				o1.show(); o2.show();
+				// draw the line
+				stroke(0);
+        fill(0);
+        strokeWeight(1);
+        linedash( o1.x+o1.width/2, o1.y+o1.height/2, 
+        o2.x+o2.width/2, o2.y+o2.height/2, 10);
+				noStroke();
+        strokeWeight(10);
+        // show x;
+        fill(255,0,0)
         textSize(30);
         text("X", 250, 80);
       }
@@ -323,7 +330,7 @@ function STFmouseReleased() {
  */
 function inside(ox, point) {
 	// if the object's x coordinate < mouse or the point x coordiante
-	// and point is less than x coord + width, etc
+	// and point is less than x coord + width,
   return (ox.x < point.x && ox.x + ox.width > point.x) &&
     (ox.y < point.y && ox.y + ox.height > point.y);
 }
@@ -364,7 +371,7 @@ class Obstacle {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.c = color("red");
+    this.c = color("blue");
     this.width = 100;
     this.height = 50;
     this.show();
