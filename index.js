@@ -9,7 +9,7 @@
 /***************************************************
 ****************GLOBACL_VARIABLES*******************
 ****************************************************/
-let game = 3;		// start with menu ( 0 )
+let game = 0;		// start with menu ( 0 )
 /***********MENU*VARS******************************/
 /***********DRAG*AND*DROP*VARS*********************/
 /***********PINCH*SHAPES*VARS**********************/
@@ -18,14 +18,15 @@ let song;
 let startX, startY, finishX, finishY;   // drawing the line variables
 let o1, o2;                             // object variables for shapes, TODO move to 
 let step = 0;
-
+let menuRectX, menuRectY;
+let m1, m2, m3;
 
 function preload() {
 	switch(game){
     // menu 
     case 0:
       {
-
+        song = loadSound("asset/Cool-Adventure-Intro.mp3");
       }
       break;
     // Drag and Drop
@@ -65,7 +66,22 @@ function setup() {
     // menu 
     case 0:
       {
+        background(220, 0, 200, 100);
+        menuRectX = 125; menuRectY = 75;
+        cr = "yellow";
 
+        // label the top
+        textAlign(CENTER);
+        fill(0);
+        textSize(30);
+        text("Menu", 300, 50);
+        
+        // image of game 1
+        m1 = new Obstacle(50, 225, menuRectX, menuRectY, cr);
+        // image of game 2
+        m2 = new Obstacle(menuRectX+113, 225, menuRectX, menuRectY, cr);
+        // image of game 3
+        m3 = new Obstacle(600-menuRectX-50, 225, menuRectX, menuRectY, cr);
       }
       break;
     // Drag and Drop
@@ -83,33 +99,23 @@ function setup() {
     // Start to Finish
     case 3:
       {
-        setupStartFinish();
-      }
-      break;
-    // something went wrong
-    default:
-      errorMsg("setup");
-      return;
-  }
-}
-
-function setupStartFinish() {
-  //song.play();    // play the song
-  // different levels of StartFinish game
-  switch (step) {
-    // LEVEL 1
-    case 0:
-      {
+        //song.play();    // play the song
         background("pink");
         // randomly set the locations of the two boxes
         let minX = 20, maxX = 450, minY = 20, maxY = 350;
         o1 = new Obstacle(random(minX,maxX/2-50), random(minY, maxY));
         o2 = new Obstacle(random(maxX/2+50,maxX), random(minY, maxY));
+        // draw dashed line
+        stroke(0);
+        fill(0);
+        strokeWeight(1);
+        linedash( o1.x+o1.width/2, o1.y+o1.height/2, 
+        o2.x+o2.width/2, o2.y+o2.height/2, 10);
       }
       break;
-    // ERROR HAPPENED
+    // something went wrong
     default:
-      errorMsg("setupStartFinish");
+      errorMsg("setup");
       return;
   }
 }
@@ -123,9 +129,7 @@ function draw() {
   {
     // menu
     case 0:
-      {
-
-      }
+      // empty
       break;
     // Drag and Drop
     case 1:
@@ -142,7 +146,11 @@ function draw() {
     // Start to Finish
     case 3:
       {
-        drawStartToFinish();
+        // draw a dashed line
+        fill(0);
+        textSize(30);
+        linedash( o1.x+o1.width/2, o1.y+o1.height/2, 
+                  o2.x+o2.width/2, o2.y+o2.height/2, 10);
       }
       break;
     // ERROR MESSAGE
@@ -150,15 +158,6 @@ function draw() {
       errorMsg("draw");
       return;
   }
-}
-
-function drawStartToFinish()
-{
-  // draw a dashed line
-  fill(0);
-  textSize(30);
-  linedash( o1.x+o1.width/2, o1.y+o1.height/2, 
-            o2.x+o2.width/2, o2.y+o2.height/2, 10);
 }
 
 /***************************************************
@@ -170,7 +169,9 @@ function mousePressed() {
     // menu
     case 0:
       {
-
+        // we don't want to change game in press
+        // because it messes up at release,
+        // logic moved to release
       }
       break;
     // Drag and Drop
@@ -204,9 +205,7 @@ function mouseDragged() {
   {
     // menu
     case 0:
-      {
-
-      }
+      // empty
       break;
     // Drag and Drop
     case 1:
@@ -224,20 +223,20 @@ function mouseDragged() {
     case 3:
       {
         // redraw the beginning
-		// to prevent multiple lines drawn at once
-		background("pink");
-		o1.show(); o2.show();
-		// log the end point
+        // to prevent multiple lines drawn at once
+        background("pink");
+        o1.show(); o2.show();
+        // log the end point
         finish = new Point(mouseX, mouseY);
         //draw the line
         stroke(0);
         line(start.x, start.y, finish.x, finish.y);
-				// draw the dashed line
+        // draw the dashed line
         fill(0);
         strokeWeight(1);
         linedash( o1.x+o1.width/2, o1.y+o1.height/2, 
         o2.x+o2.width/2, o2.y+o2.height/2, 10);
-				noStroke();
+        noStroke();
         strokeWeight(10);
         fill(0);
       }
@@ -255,7 +254,16 @@ function mouseReleased() {
     // menu
     case 0:
       {
-
+        let p = new Point(mouseX, mouseY);
+        // change game to Drag and Drop
+        if(inside(m1, p))
+          game = 1;
+        else if(inside(m2, p))
+          game = 2;
+        else if(inside(m3, p))
+          game = 3;
+        // redo setup for new game
+        setup();
       }
       break;
     // Drag and Drop
@@ -284,42 +292,38 @@ function mouseReleased() {
 }
 
 function STFmouseReleased() {
-	switch (step) {
-    case 0:
-      // if line is inside boxes
-			if ((inside(o1, start) && inside(o2, finish))
-				|| (inside(o1, finish) && inside(o2, start)) ) {
-        // draw the smile face
-        fill(0);
-        textSize(30);
-        text(":)", 250, 80);
-        noStroke();
-        // change boxes color to green
-        o1.clr = "green";
-        o2.clr = "green";
-        return;
-      } else {
+  // if line is inside boxes
+  if ((inside(o1, start) && inside(o2, finish))
+    || (inside(o1, finish) && inside(o2, start)) ) {
+    // draw the smile face
+    fill(0);
+    textSize(30);
+    text(":)", 250, 80);
+    noStroke();
+    // change boxes color to green
+    o1.clr = "green";
+    o2.clr = "green";
+    // wait a few seconds and redo game
+    setTimeout(() => {  setup(); }, 2500);
+    return;
+  } else {
 
-        // redraw the beginning
-				// to prevent multiple lines drawn at once
-				background("pink");
-				o1.show(); o2.show();
-				// draw the line
-				stroke(0);
-        fill(0);
-        strokeWeight(1);
-        linedash( o1.x+o1.width/2, o1.y+o1.height/2, 
-        o2.x+o2.width/2, o2.y+o2.height/2, 10);
-				noStroke();
-        strokeWeight(10);
-        // show x;
-        fill(255,0,0)
-        textSize(30);
-        text("X", 250, 80);
-      }
-      break;
-    default:
-      errorMsg("mouseReleased", 1);
+    // redraw the beginning
+    // to prevent multiple lines drawn at once
+    background("pink");
+    o1.show(); o2.show();
+    // draw the line
+    stroke(0);
+    fill(0);
+    strokeWeight(1);
+    linedash( o1.x+o1.width/2, o1.y+o1.height/2, 
+    o2.x+o2.width/2, o2.y+o2.height/2, 10);
+    noStroke();
+    strokeWeight(10);
+    // show x;
+    fill(255,0,0)
+    textSize(30);
+    text("X", 250, 80);
   }
 }
 
@@ -327,6 +331,7 @@ function STFmouseReleased() {
 
 /*
  * return true if point is inside rectangle
+ * ox is an Obstacle, point is a Point
  */
 function inside(ox, point) {
 	// if the object's x coordinate < mouse or the point x coordiante
@@ -368,12 +373,12 @@ function errorMsg(name, debug=0) {
 
 /*************Classes*****************************/
 class Obstacle {
-  constructor(x, y) {
+  constructor(x, y, w=100, h=50, cr="blue") {
     this.x = x;
     this.y = y;
-    this.c = color("blue");
-    this.width = 100;
-    this.height = 50;
+    this.c = color(cr);
+    this.width = w;
+    this.height = h;
     this.show();
 	}
 	// get color
